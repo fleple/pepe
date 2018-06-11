@@ -1,13 +1,12 @@
 <template>
   <div class='form-container'>
-    <h1>Sign in</h1>
+    <h1>Login</h1>
     <form @submit.prevent="submit">
-      <input autocomplete="cc-name" type="text" v-model="name" placeholder='@name'>
       <input autocomplete="email" type="email" v-model="email" placeholder='email'>
       <input autocomplete type="password" v-model="password" placeholder='Password'>
       <input class='btn-submit' type='submit' value='submit'/>
     </form>
-    <p v-for="err in errors" :key="err">{{err}}</p>
+    <p v-for="error in errors" :key="error">{{error}}</p>
   </div>
 </template>
 
@@ -15,32 +14,30 @@
 import axios from 'axios';
 
 export default {
-  name: 'signin',
+  name: 'login',
   data() {
     return {
-      name: 'goodboy',
-      email: 'asd@asd.com',
-      password: '123123',
+      email: '',
+      password: '',
       errors: []
     }
   },
   methods: {
     submit: function() {
-      const user = {
+      const userData = {
         name: this.name,
         email: this.email,
         password: this.password
       };
-      console.log('submit', user);
-      axios.post('/api/users/', user)
-        .then(res => {
-          console.log('res', res);
-          this.errors = [];
-        })
-        .catch(err => {
-          this.errors.push(err.response.data.errors.error);
-          console.log('err', err.response.data.errors);
-        });
+      this.errors = [];
+      axios.post('/api/auth/', userData).then(res => {
+        console.log('res', res);
+        this.$route.router.go('/signin');
+      }).catch(err => {
+        this.errors.push(err.response.data.error);
+        console.log('login err', err.response.data);
+      });
+
     }
   }
 }

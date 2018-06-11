@@ -10,12 +10,16 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(coin, index) in currentCoins" :key="coin.short" v-bind:class="{changed: coin.active}">
+        <tr
+          v-for="(coin, index) in currentCoins"
+          :key="coin.short"
+          class='row'
+          v-bind:class="[coin.perc > 0 ? 'change-up' : 'change-down']">
           <td
             style="text-align:left">
             #{{index + 1}}. {{coin.long}}
             <i v-bind:class="[coin.short, 'cc']"/>
-            {{coin.short}}
+            <router-link class='link-coin' :to='{ path: `coins/${coin.short}` }'>{{coin.short}}</router-link>
           </td>
           <td>${{coin.mktcap}}</td>
           <td>${{coin.price}}</td>
@@ -31,13 +35,16 @@ import { mapGetters } from 'vuex';
 
 export default {
   name: 'Main',
-  created() {
-    if(!this.$store.getters.currentCoins[0]) {
-      this.$store.dispatch('fetchCoins');
-    }
-    this.$store.dispatch('fetchingCoins');
-  },
+  // created() {
+  //   if(!this.$store.getters.currentCoins[0]) {
+  //     this.$store.dispatch('fetchCoins');
+  //   }
+  //   this.$store.dispatch('fetchingCoins');
+  // },
   computed: {
+    allCoins() {
+      return this.$store.getters.allCoins;
+    },
     currentCoins() {
       return this.$store.getters.currentCoins;
     }
@@ -50,6 +57,7 @@ export default {
   width: 90%;
   margin: 0 auto;
   margin-top: 50px;
+  margin-bottom: 50px;
   table-layout: fixed;
   border-collapse: collapse;
   border: 1px solid  rgba(255, 255, 255, 0.2);
@@ -72,8 +80,17 @@ td {
   border-bottom: 1px solid  rgba(255, 255, 255, 0.2);
 }
 
-.changed {
-  background-color: rgba(255, 255, 255, 0.3);
+.link-coin {
+  text-transform: none;
+  text-decoration: none;
+  color: #fff;
+}
+
+.change-down {
+  background-color: rgba(151, 20, 20, 0.2);
+}
+.change-up {
+  background-color: rgba(26, 226, 26, 0.2);
 }
 </style>
 

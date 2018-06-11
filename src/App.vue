@@ -11,7 +11,13 @@ export default {
   name: 'App',
   components: {
     mainHeader
-  }
+  },
+  created() {
+    if(!this.$store.getters.currentCoins[0]) {
+      this.$store.dispatch('fetchCoins');
+    }
+    this.$store.dispatch('fetchingCoins');
+  },
 }
 </script>
 

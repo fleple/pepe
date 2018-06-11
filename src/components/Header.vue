@@ -16,6 +16,9 @@
       <li>
         <router-link to='/user'>User</router-link>
       </li>
+      <li>
+        <router-link to='/test'>Test</router-link>
+      </li>
     </ul>
   </header>
 </template>

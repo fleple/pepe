@@ -1,4 +1,4 @@
-# pepe
+# Pepe
 
 > crypto simulator
 

@@ -25,17 +25,19 @@ function makePrice(price) {
 
 const coins = {
   state: {
+    allCoins: [],
     currentCoins: []
   },
   
   mutations: {
     FETCH_COINS(state, coins) {
-      state.currentCoins = coins;
+      state.allCoins = coins;
     },
     REPLACE_ONE(state ,coin) {
-      for(let i = 0; i < state.currentCoins.length; i++) {
-        if(state.currentCoins[i].short === coin.short) {
-          state.currentCoins.splice(i, 1, coin);
+      // state.allCoins.find(currentCoin => currentCoin.short === coin.short);
+      for(let i = 0; i < state.allCoins.length; i++) {
+        if(state.allCoins[i].short === coin.short) {
+          state.allCoins.splice(i, 1, coin);
         }
       }
     }
@@ -70,8 +72,11 @@ const coins = {
   },
 
   getters: {
+    allCoins(state) {
+      return state.allCoins;
+    },
     currentCoins(state) {
-      return state.currentCoins;
+      return state.allCoins.slice(0, 30);
     }
   }
 }
