@@ -19,7 +19,7 @@
           <td
             style="text-align:left">
             #{{index + 1}}. {{coin.long}}
-            <i v-bind:class="[coin.short, 'cc']"/>
+            <i :class="[coin.short, 'cc']"/>
             {{coin.short}}
           </td>
           <td>${{coin.mktcap}}</td>
@@ -45,19 +45,17 @@ export default {
     }
   },
   computed: {
-    allCoins() {
-      return this.$store.getters.allCoins;
-    },
-    currentCoins() {
-      return this.$store.getters.currentCoins;
-    }
+    ...mapGetters([
+      'allCoins',
+      'currentCoins'
+    ])
   }
 }
 </script>
 
 <style scoped>
 .main-table {
-  width: 90%;
+  width: 1200px;
   margin: 0 auto;
   margin-top: 50px;
   margin-bottom: 50px;

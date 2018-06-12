@@ -12,6 +12,7 @@
 
 <script>
 import axios from 'axios';
+import { mapActions, mapGetters, mapMutations } from 'vuex';
 
 export default {
   name: 'login',
@@ -19,27 +20,34 @@ export default {
     return {
       email: '',
       password: '',
-      errors: []
+      errors: null
     }
   },
   methods: {
+    ...mapActions([
+      'login'
+    ]),
+    ...mapMutations([
+      'SET_USER'
+    ]),
     submit: function() {
       const userData = {
-        name: this.name,
         email: this.email,
         password: this.password
       };
-      this.errors = [];
-      axios.post('/api/auth/', userData).then(res => {
-        console.log('res', res);
-        this.$router.push({path: '/main'});
-      }).catch(err => {
-        console.log('err',err);
-        this.errors.push(err.response.data.error);
-        console.log('login err', err.response.data);
-      });
 
+      this.login(userData).then(res => {
+        this.SET_USER(res.data.user);
+        this.$router.push('/user');
+      }).catch(err => {
+        this.errors = err.response.data;
+      });
     }
+  },
+  computed: {
+    ...mapGetters([
+      'userState'
+    ])
   }
 }
 </script>
@@ -49,7 +57,7 @@ export default {
   margin-top: 50px;
   padding: 50px;
   padding-bottom: 70px;
-  width: 30%;
+  width: 350px;
   margin: 0 auto;
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
@@ -77,7 +85,7 @@ input {
   border: 1px solid #ffffff;
   color: #ffffff;
   transition: all .25s ease-in-out;
-  border-radius:4px;
+  border-radius: 4px;
 }
 
 input::placeholder {
@@ -91,7 +99,6 @@ button:focus {
 .btn-submit:hover {
   cursor: pointer;
   background-color: rgba(255, 255, 255, 0.2);
-  /* color: #3494E6; */
 }
 
 p {

@@ -5,44 +5,36 @@ const user = {
     name: '',
     email: '',
     token: '',
-    errorsSign: [],
-    errorsLogin: []
   },
 
   mutations: {
-    SIGNIN(state, user) {
+    SET_USER(state, user) {
       state.name = user.name;
       state.email = user.email;
       state.token = user.token;
     },
-    SIGNIN_ERRORS(state, errors) {
-      state.errors = errors;
-    },
     SIGN_OUT(state) {
       state.name = state.email = state.token = '';
+      state.errorsSign = errorsLogin = null;
     }
   },
 
   actions: {
-    signIn({ commit }) {
-      axios.post('/api/users/', user).then(res => {
-        commit('SIGNIN', res.data.user);
-      }).catch(err => {
-        commit('SIGNIN_ERRORS', err.response.data);
-      });
+    signIn({ commit }, userData) {
+      return axios.post('/api/users', userData);
+    },
+    login({ commit}, userData) {
+      return axios.post('/api/auth', userData);
     }
   },
 
   getters: {
-    getUser(state) {
+    userState(state) {
       return {
         name: state.name,
         email: state.email,
         token: state.token
       };
-    },
-    getErrorsSign(state) {
-      return state.errorsSign;
     }
   }
 }

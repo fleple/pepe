@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import Main from '@/components/Main'
 import Signin from '@/components/Signin'
 import Login from '@/components/Login'
-import Test from '@/components/Test'
+import User from '@/components/User'
 import Coin from '@/components/Coin'
 
 Vue.use(Router);
@@ -27,9 +27,9 @@ export default new Router({
       component: Login
     },
     {
-      path: '/test',
-      name: 'Test',
-      component: Test
+      path: '/user',
+      name: 'User',
+      component: User
     },
     {
       path: '/coins/:coin',

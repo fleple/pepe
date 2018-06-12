@@ -13,6 +13,7 @@
 
 <script>
 import axios from 'axios';
+import { mapActions, mapGetters, mapMutations } from 'vuex';
 
 export default {
   name: 'signin',
@@ -21,27 +22,34 @@ export default {
       name: 'goodboy',
       email: 'asd@asd.com',
       password: '123123',
-      errors: []
+      errors: null
     }
   },
   methods: {
+    ...mapActions([
+      'signIn'
+    ]),
+    ...mapMutations([
+      'SET_USER'
+    ]),
     submit: function() {
       const user = {
         name: this.name,
         email: this.email,
         password: this.password
       };
-      console.log('submit', user);
-      axios.post('/api/users/', user)
-        .then(res => {
-          console.log('res', res);
-          this.errors = [];
-        })
-        .catch(err => {
-          this.errors.push(err.response.data.errors.error);
-          console.log('err', err.response.data.errors);
-        });
+      this.signIn(user).then(res => {
+        this.SET_USER(res.data.user);
+        this.$router.push('/user');
+      }).catch(err => {
+        this.errors = err.response.data.errors;
+      });
     }
+  },
+  computed: {
+    ...mapGetters([
+      'userState'
+    ])
   }
 }
 </script>
@@ -51,7 +59,7 @@ export default {
   margin-top: 50px;
   padding: 50px;
   padding-bottom: 70px;
-  width: 30%;
+  width: 350px;
   margin: 0 auto;
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
