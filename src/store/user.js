@@ -1,4 +1,5 @@
 import axios from 'axios';
+import decode from 'jwt-decode';
 
 const user = {
   state: {
@@ -13,9 +14,12 @@ const user = {
       state.email = user.email;
       state.token = user.token;
     },
-    SIGN_OUT(state) {
+    LOG_OUT(state) {
       state.name = state.email = state.token = '';
-      state.errorsSign = errorsLogin = null;
+      localStorage.pepeCry = '';
+    },
+    SET_IN_LOCAL_STORAGE(state) {
+      localStorage.pepeCry = state.token;
     }
   },
 
@@ -23,8 +27,15 @@ const user = {
     signIn({ commit }, userData) {
       return axios.post('/api/users', userData);
     },
-    login({ commit}, userData) {
+    login({ commit }, userData) {
       return axios.post('/api/auth', userData);
+    },
+    initUser({ commit }) {
+      let userData = {
+        ...decode(localStorage.pepeCry),
+        token: localStorage.pepeCry
+      };
+      commit('SET_USER', userData);
     }
   },
 

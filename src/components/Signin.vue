@@ -30,7 +30,8 @@ export default {
       'signIn'
     ]),
     ...mapMutations([
-      'SET_USER'
+      'SET_USER',
+      'SET_IN_LOCAL_STORAGE'
     ]),
     submit: function() {
       const user = {
@@ -40,6 +41,7 @@ export default {
       };
       this.signIn(user).then(res => {
         this.SET_USER(res.data.user);
+        this.SET_IN_LOCAL_STORAGE();
         this.$router.push('/user');
       }).catch(err => {
         this.errors = err.response.data.errors;

@@ -13,6 +13,7 @@ export default {
     mainHeader
   },
   created() {
+    this.$store.dispatch('initUser');
     if(!this.$store.getters.currentCoins[0]) {
       this.$store.dispatch('fetchCoins');
     }

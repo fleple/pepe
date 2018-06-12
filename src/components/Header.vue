@@ -2,27 +2,36 @@
   <header>
     <ul>
       <li>
-        <router-link to='/main'>Pepe</router-link>
+        <router-link to='/main'>Pepe Cry</router-link>
       </li>
-      <li>
-        <router-link to='/user'>Username</router-link>
+      <li v-if="userState.token">
+        <router-link to='/user'>{{userState.name || 'username'}}</router-link>
       </li>
-      <li>
+      <li v-if="!userState.token">
         <router-link to='/signin'>Sign In</router-link>
       </li>
-      <li>
+      <li v-if="!userState.token">
         <router-link to='/login'>Login</router-link>
       </li>
-      <li>
-        <router-link to='/logout'>Log Out</router-link>
+      <li v-if="userState.token">
+        <a @click="LOG_OUT">Log Out</a>
       </li>
     </ul>
   </header>
 </template>
 
 <script>
+import { mapGetters, mapMutations } from 'vuex';
 export default {
   name: 'main-header',
+  methods: {
+    ...mapMutations(['LOG_OUT'])
+  },
+  computed: {
+    ...mapGetters([
+      'userState'
+    ])
+  }
 }  
 </script>
 
