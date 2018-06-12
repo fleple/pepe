@@ -5,6 +5,9 @@
         <router-link to='/main'>Pepe</router-link>
       </li>
       <li>
+        <router-link to='/user'>Username</router-link>
+      </li>
+      <li>
         <router-link to='/signin'>Sign In</router-link>
       </li>
       <li>
@@ -12,12 +15,6 @@
       </li>
       <li>
         <router-link to='/logout'>Log Out</router-link>
-      </li>
-      <li>
-        <router-link to='/user'>User</router-link>
-      </li>
-      <li>
-        <router-link to='/test'>Test</router-link>
       </li>
     </ul>
   </header>
@@ -61,6 +58,10 @@ a {
 }
 a:hover {
   cursor: pointer;
+  box-shadow: 0px 2px 0px 0px #aa4b6b; 
+}
+
+.router-link-active {
   box-shadow: 0px 2px 0px 0px #aa4b6b; 
 }
 </style>

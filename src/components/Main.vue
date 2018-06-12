@@ -13,13 +13,14 @@
         <tr
           v-for="(coin, index) in currentCoins"
           :key="coin.short"
+          @click="goTo(coin.short)"
           class='row'
           v-bind:class="[coin.perc > 0 ? 'change-up' : 'change-down']">
           <td
             style="text-align:left">
             #{{index + 1}}. {{coin.long}}
             <i v-bind:class="[coin.short, 'cc']"/>
-            <router-link class='link-coin' :to='{ path: `coins/${coin.short}` }'>{{coin.short}}</router-link>
+            {{coin.short}}
           </td>
           <td>${{coin.mktcap}}</td>
           <td>${{coin.price}}</td>
@@ -35,12 +36,14 @@ import { mapGetters } from 'vuex';
 
 export default {
   name: 'Main',
-  // created() {
-  //   if(!this.$store.getters.currentCoins[0]) {
-  //     this.$store.dispatch('fetchCoins');
-  //   }
-  //   this.$store.dispatch('fetchingCoins');
-  // },
+  methods: {
+    goTo: function(coinShort) {
+      this.$router.push({
+        name: 'Coin',
+        params: { coin: coinShort }
+      });
+    }
+  },
   computed: {
     allCoins() {
       return this.$store.getters.allCoins;
@@ -80,17 +83,17 @@ td {
   border-bottom: 1px solid  rgba(255, 255, 255, 0.2);
 }
 
-.link-coin {
-  text-transform: none;
-  text-decoration: none;
-  color: #fff;
+.row:hover {
+  cursor: pointer;
+  opacity: 0.9;
+  box-shadow: 0px 0px 0px 1px #eee, 0px 0px 0px 1px #eee;
 }
 
 .change-down {
-  background-color: rgba(151, 20, 20, 0.2);
+  background-color: rgba(151, 20, 20, 0.1);
 }
 .change-up {
-  background-color: rgba(26, 226, 26, 0.2);
+  background-color: rgba(26, 226, 26, 0.1);
 }
 </style>
 

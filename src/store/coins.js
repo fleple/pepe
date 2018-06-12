@@ -1,6 +1,62 @@
 import axios from 'axios';
 import io from "socket.io-client";
 
+const coins = {
+  state: {
+    allCoins: [],
+    currentCoins: []
+  },
+  
+  mutations: {
+    FETCH_COINS(state, coins) {
+      state.allCoins = coins;
+      state.currentCoins = coins.slice(0, 30);
+    },
+    REPLACE_ONE(state ,coin) {
+      for(let i = 0; i < state.currentCoins.length; i++) {
+        if(state.currentCoins[i].short === coin.short) {
+          state.currentCoins.splice(i, 1, coin);
+        }
+      }
+    }
+  },
+
+  actions: {
+    fetchCoins({commit}) {
+      axios.get('http://coincap.io/front').then(response => {
+        return response.data.map(item => {
+          return {
+            ...item,
+            mktcap: makeCapCost(item.mktcap),
+            price: makePrice(item.price)
+          };
+        })
+      }).then(coins => {
+        commit('FETCH_COINS', coins);
+      });
+    },
+    fetchingCoins({ commit }) {
+      const socket = io.connect('https://coincap.io');
+      socket.on('trades', (tradeMsg) => {
+        commit('REPLACE_ONE' ,{
+          ...tradeMsg.msg,
+          mktcap: makeCapCost(tradeMsg.msg.mktcap),
+          price: makePrice(tradeMsg.msg.price)
+         });
+      });
+    }
+  },
+
+  getters: {
+    allCoins(state) {
+      return state.allCoins;
+    },
+    currentCoins(state) {
+      return state.currentCoins;
+    }
+  }
+}
+
 function makeCapCost(mktcap) {
   return mktcap.toLocaleString('en').split('.')[0].split(',').join(' ');
 }
@@ -21,64 +77,6 @@ function makePrice(price) {
     result += '0000';
   }
   return result;
-}
-
-const coins = {
-  state: {
-    allCoins: [],
-    currentCoins: []
-  },
-  
-  mutations: {
-    FETCH_COINS(state, coins) {
-      state.allCoins = coins;
-    },
-    REPLACE_ONE(state ,coin) {
-      // state.allCoins.find(currentCoin => currentCoin.short === coin.short);
-      for(let i = 0; i < state.allCoins.length; i++) {
-        if(state.allCoins[i].short === coin.short) {
-          state.allCoins.splice(i, 1, coin);
-        }
-      }
-    }
-  },
-
-  actions: {
-    fetchCoins({commit}) {
-      axios.get('http://coincap.io/front').then(response => {
-        return response.data.map(item => {
-          return {
-            ...item,
-            mktcap: makeCapCost(item.mktcap),
-            price: makePrice(item.price),
-            active: false
-          };
-        })
-      }).then(coins => {
-        commit('FETCH_COINS', coins);
-      });
-    },
-    fetchingCoins({ commit }) {
-      const socket = io.connect('https://coincap.io');
-      socket.on('trades', (tradeMsg) => {
-        commit('REPLACE_ONE' ,{
-          ...tradeMsg.msg,
-          mktcap: makeCapCost(tradeMsg.msg.mktcap),
-          price: makePrice(tradeMsg.msg.price),
-          active: true
-         });
-      });
-    }
-  },
-
-  getters: {
-    allCoins(state) {
-      return state.allCoins;
-    },
-    currentCoins(state) {
-      return state.allCoins.slice(0, 30);
-    }
-  }
 }
 
 export default coins;

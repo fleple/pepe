@@ -17,6 +17,9 @@ const user = {
     },
     SIGNIN_ERRORS(state, errors) {
       state.errors = errors;
+    },
+    SIGN_OUT(state) {
+      state.name = state.email = state.token = '';
     }
   },
 

@@ -1,5 +1,5 @@
 <template>
-  <h1>hello {{coinName}} {{currentPrice}}</h1>
+  <h1>{{coinName}} {{currentPrice}}</h1>
 </template>
 
 <script>

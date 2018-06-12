@@ -32,8 +32,9 @@ export default {
       this.errors = [];
       axios.post('/api/auth/', userData).then(res => {
         console.log('res', res);
-        this.$route.router.go('/signin');
+        this.$router.push({path: '/main'});
       }).catch(err => {
+        console.log('err',err);
         this.errors.push(err.response.data.error);
         console.log('login err', err.response.data);
       });
