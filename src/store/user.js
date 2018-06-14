@@ -6,6 +6,9 @@ const user = {
     name: '',
     email: '',
     token: '',
+    money: 0,
+    coins: [],
+    tradeHistory: []
   },
 
   mutations: {
@@ -13,9 +16,14 @@ const user = {
       state.name = user.name;
       state.email = user.email;
       state.token = user.token;
+      state.money = user.money;
+      state.coins = user.coins;
+      state.tradeHistory = user.tradeHistory;
     },
     LOG_OUT(state) {
       state.name = state.email = state.token = '';
+      state.coins = state.tradeHistory = [];
+      state.money = 0;
       localStorage.pepeCry = '';
     },
     SET_IN_LOCAL_STORAGE(state) {
@@ -31,11 +39,18 @@ const user = {
       return axios.post('/api/auth', userData);
     },
     initUser({ commit }) {
-      let userData = {
-        ...decode(localStorage.pepeCry),
-        token: localStorage.pepeCry
-      };
-      commit('SET_USER', userData);
+      if(localStorage.pepeCry) {
+        let userData = {
+          ...decode(localStorage.pepeCry),
+          token: localStorage.pepeCry
+        };
+        axios.post('/api/auth/validate_token', userData).then(res => {
+          console.log('req validate token', res);
+          commit('SET_USER', res.data.user);
+        })
+      } else {
+        return;
+      }
     }
   },
 
@@ -44,7 +59,10 @@ const user = {
       return {
         name: state.name,
         email: state.email,
-        token: state.token
+        token: state.token,
+        money: state.money,
+        coins: state.coins,
+        tradeHistory: state.tradeHistory
       };
     }
   }

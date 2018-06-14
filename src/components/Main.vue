@@ -22,8 +22,8 @@
             <i :class="[coin.short, 'cc']"/>
             {{coin.short}}
           </td>
-          <td>${{coin.mktcap}}</td>
-          <td>${{coin.price}}</td>
+          <td>${{makeCapCost(coin.mktcap)}}</td>
+          <td>${{makePrice(coin.price)}}</td>
           <td>{{coin.perc}}%</td>
         </tr>
       </tbody>
@@ -42,6 +42,26 @@ export default {
         name: 'Coin',
         params: { coin: coinShort }
       });
+    },
+    makePrice: function(price) {
+      let result = price.toLocaleString('ru-RU');
+      if(!result.split(',')[1]) {
+        return result + '.0000';
+      }
+      let currentLength = result.split(',')[1].length;
+      if(currentLength === 3) {
+        result += '0';
+      } else if(currentLength === 2) {
+        result += '00';
+      } else if(currentLength === 1) {
+        result += '000';
+      } else if(currentLength === 0) {
+        result += '0000';
+      }
+      return result;
+    },
+    makeCapCost: function(mktcap) {
+      return mktcap.toLocaleString('en').split('.')[0].split(',').join(' ');
     }
   },
   computed: {
@@ -55,7 +75,7 @@ export default {
 
 <style scoped>
 .main-table {
-  width: 1200px;
+  width: 1150px;
   margin: 0 auto;
   margin-top: 50px;
   margin-bottom: 50px;

@@ -10,7 +10,7 @@ const coins = {
   mutations: {
     FETCH_COINS(state, coins) {
       state.allCoins = coins;
-      state.currentCoins = coins.slice(0, 30);
+      state.currentCoins = coins.slice(0, 100);
     },
     REPLACE_ONE(state ,coin) {
       for(let i = 0; i < state.currentCoins.length; i++) {
@@ -26,9 +26,7 @@ const coins = {
       axios.get('http://coincap.io/front').then(response => {
         return response.data.map(item => {
           return {
-            ...item,
-            mktcap: makeCapCost(item.mktcap),
-            price: makePrice(item.price)
+            ...item
           };
         })
       }).then(coins => {
@@ -38,11 +36,7 @@ const coins = {
     fetchingCoins({ commit }) {
       const socket = io.connect('https://coincap.io');
       socket.on('trades', (tradeMsg) => {
-        commit('REPLACE_ONE' ,{
-          ...tradeMsg.msg,
-          mktcap: makeCapCost(tradeMsg.msg.mktcap),
-          price: makePrice(tradeMsg.msg.price)
-         });
+        commit('REPLACE_ONE' ,tradeMsg.msg);
       });
     }
   },
@@ -59,24 +53,6 @@ const coins = {
 
 function makeCapCost(mktcap) {
   return mktcap.toLocaleString('en').split('.')[0].split(',').join(' ');
-}
-
-function makePrice(price) {
-  let result = price.toLocaleString('ru-RU');
-  if(!result.split(',')[1]) {
-    return result + '.0000';
-  }
-  let currentLength = result.split(',')[1].length;
-  if(currentLength === 3) {
-    result += '0';
-  } else if(currentLength === 2) {
-    result += '00';
-  } else if(currentLength === 1) {
-    result += '000';
-  } else if(currentLength === 0) {
-    result += '0000';
-  }
-  return result;
 }
 
 export default coins;

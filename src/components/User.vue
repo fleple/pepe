@@ -4,6 +4,9 @@
     <ul>
       <li v-for="(item, index) in userState" :key="index">{{item}}</li>
     </ul>
+    <div>
+      your money {{userState.money}}
+    </div>
   </div>
 </template>
 

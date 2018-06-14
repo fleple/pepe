@@ -25,7 +25,9 @@ import { mapGetters, mapMutations } from 'vuex';
 export default {
   name: 'main-header',
   methods: {
-    ...mapMutations(['LOG_OUT'])
+    ...mapMutations([
+      'LOG_OUT'
+    ])
   },
   computed: {
     ...mapGetters([
@@ -44,7 +46,7 @@ header {
 ul {
   list-style: none;
   display: flex;
-  width: 1200px;
+  width: 1150px;
   margin: 0 auto;
   background-color: rgba(255, 255, 255, 0.0);
 }
