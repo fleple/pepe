@@ -10,7 +10,7 @@ const coins = {
   mutations: {
     FETCH_COINS(state, coins) {
       state.allCoins = coins;
-      state.currentCoins = coins.slice(0, 100);
+      state.currentCoins = coins.slice(0, 30);
     },
     REPLACE_ONE(state ,coin) {
       for(let i = 0; i < state.currentCoins.length; i++) {

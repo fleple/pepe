@@ -1,23 +1,24 @@
 <template>
   <div id="app">
-    <main-header></main-header>
+    <MainHeader/>
     <router-view/>
   </div>
 </template>
 
 <script>
-import mainHeader from './components/Header';
+import MainHeader from './components/Header';
 export default {
   name: 'App',
   components: {
-    mainHeader
+    MainHeader
   },
   created() {
-    this.$store.dispatch('initUser');
-    if(!this.$store.getters.currentCoins[0]) {
-      this.$store.dispatch('fetchCoins');
+    const { dispatch, getters } = this.$store;
+    dispatch('initUser');
+    if(!getters.currentCoins[0]) {
+      dispatch('fetchCoins');
     }
-    this.$store.dispatch('fetchingCoins');
+    dispatch('fetchingCoins');
   },
 }
 </script>
