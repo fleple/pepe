@@ -24,13 +24,7 @@ const coins = {
   actions: {
     fetchCoins({commit}) {
       axios.get('http://coincap.io/front').then(response => {
-        return response.data.map(item => {
-          return {
-            ...item
-          };
-        })
-      }).then(coins => {
-        commit('FETCH_COINS', coins);
+        commit('FETCH_COINS', response.data);
       });
     },
     fetchingCoins({ commit }) {
@@ -49,10 +43,6 @@ const coins = {
       return state.currentCoins;
     }
   }
-}
-
-function makeCapCost(mktcap) {
-  return mktcap.toLocaleString('en').split('.')[0].split(',').join(' ');
 }
 
 export default coins;

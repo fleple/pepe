@@ -45,7 +45,6 @@ const user = {
           token: localStorage.pepeCry
         };
         axios.post('/api/auth/validate_token', userData).then(res => {
-          // console.log('req validate token', res);
           commit('SET_USER', res.data.user);
         })
       } else {

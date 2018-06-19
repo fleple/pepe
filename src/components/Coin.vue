@@ -32,6 +32,10 @@
         </div>
         <h4 class='message'>{{message}}</h4>
         <button class='btn-buy' @click='buy'>buy</button>
+         <Chart :name='coinName'/>
+         <button @click='reqHistory(1)'>1 day</button>
+         <button @click='reqHistory(90)'>90 days</button>
+         <button @click='reqHistory(180)'>180 days</button>
       </div>
     </div>
   </div>
@@ -39,10 +43,15 @@
 
 <script>
 import axios from 'axios';
-import { mapGetters, mapMutations } from 'vuex'; 
+import { mapGetters, mapMutations, mapActions } from 'vuex';
+import Chart from './Chart';
 
 export default {
   name: 'Coin',
+  components: {
+    Chart
+  },
+
   data() {
     return {
       usdCount: '',
@@ -50,8 +59,20 @@ export default {
       message: ''
     }
   },
+
+  created() {
+    this.fetchInfo(this.coinName);
+  },
+
   methods: {
     ...mapMutations(['SET_USER']),
+    ...mapActions(['fetchInfo', 'fetchHistory']),
+    reqHistory(days) {
+      this.fetchHistory({
+        coinShort: this.coinName,
+        daysNum: days
+      });
+    },
     coinCountChange(event) {
       this.usdCount = +this.currentPrice * +event.target.value;
       this.message = `Buy ${event.target.value} ${this.coinName} for ${this.usdCount}$`;
@@ -68,7 +89,7 @@ export default {
         coinName: this.coinName,
         coinCount: this.coinCount
       };
-      console.log('ending to buy', buyInfo);
+      // console.log('ending to buy', buyInfo);
       axios.post('/api/trade/buy', buyInfo).then(res => {
         console.log('buy res', res);
         this.SET_USER(res.data.user);
@@ -78,6 +99,7 @@ export default {
       this.coinCount = '';
     }
   },
+
   computed: {
     ...mapGetters(['userState']),
     coinName() {
@@ -85,13 +107,10 @@ export default {
     },
     currentPrice() {
       const coinName = this.$route.params.coin;
-      const { currentCoins } = this.$store.getters; 
-      if(currentCoins[0]) {
-        let coin = currentCoins.find(coin => coinName === coin.short);
-        return coin.price;
-      } else {
-        return 0;
-      }
+      const { currentCoins } = this.$store.getters;
+      if(currentCoins[0])
+        return currentCoins.find(coin => coinName === coin.short).price;
+      return 
     }
   }
 }
@@ -117,7 +136,7 @@ export default {
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
   padding: 10px;
-  width: 25%;
+  width: 20%;
   color: white;
 }
 
@@ -131,7 +150,7 @@ hr {
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
   padding: 10px;
-  width: 65%;
+  width: 75%;
   color: white;
 }
 
