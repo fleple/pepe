@@ -7,6 +7,7 @@
 
 <script>
 import MainHeader from './components/Header';
+import { mapGetters } from 'vuex';
 export default {
   name: 'App',
   components: {
@@ -14,12 +15,17 @@ export default {
   },
   created() {
     const { dispatch, getters } = this.$store;
-    dispatch('initUser');
+    if(!this.userState.name) {
+      dispatch('initUser');
+    }
     if(!getters.currentCoins[0]) {
       dispatch('fetchCoins');
     }
     dispatch('fetchingCoins');
   },
+  computed: {
+    ...mapGetters(['userState'])
+  }
 }
 </script>
 

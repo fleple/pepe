@@ -4,7 +4,8 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import store from './store/mainStore';
-import '../node_modules/cryptocoins-icons/webfont/cryptocoins.css';
+// import '../node_modules/cryptocoins-icons/webfont/cryptocoins.css';
+import '../node_modules/cryptocurrency-icons/dist/cryptocurrency-icons-32-white.css';
 
 Vue.config.productionTip = false
 

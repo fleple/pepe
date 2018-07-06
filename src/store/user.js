@@ -20,6 +20,12 @@ const user = {
       state.coins = user.coins;
       state.tradeHistory = user.tradeHistory;
     },
+    SET_COINS(state, user) {
+      state.coins = user.coins;
+    },
+    SET_TRADE_HISTORY(state, user) {
+      state.tradeHistory = user.tradeHistory;
+    },
     LOG_OUT(state) {
       state.name = state.email = state.token = '';
       state.coins = state.tradeHistory = [];
@@ -65,6 +71,7 @@ const user = {
       };
     }
   }
+  
 }
 
 export default user;

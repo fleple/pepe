@@ -15,12 +15,16 @@
           :key="coin.short"
           @click="goTo(coin.short)"
           class='row'
-          v-bind:class="[coin.perc > 0 ? 'change-up' : 'change-down']">
+          :class="[coin.perc > 0 ? 'change-up' : 'change-down']">
           <td
             style="text-align:left">
-            #{{index + 1}}. {{coin.long}}
-            <i :class="[coin.short, 'cc']"/>
-            {{coin.short}}
+            <span>#{{index + 1}}.</span>
+            <span>
+              <i :class="[`crypto-icon-32-white-${coin.short.toLowerCase()}` ,'crypto-icon-32 crypto-icon-32-white']"/>
+            </span>
+            <span>
+             {{coin.long}}
+            </span>
           </td>
           <td>${{makeCapCost(coin.mktcap)}}</td>
           <td>${{makePrice(coin.price)}}</td>
@@ -112,6 +116,10 @@ td {
 }
 .change-up {
   background-color: rgba(26, 226, 26, 0.1);
+}
+
+.crypto-icon-32 {
+  transform: translateY(8px) scale(0.9);
 }
 </style>
 

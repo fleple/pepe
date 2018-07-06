@@ -30,7 +30,7 @@ const singleCoin = {
     },
     fetchHistory({ commit }, { daysNum, coinShort }) {
       // console.log('req his', daysNum, coinShort);
-      axios.get(`http://coincap.io/history/${daysNum}day/${coinShort}`).then(res => {
+      return axios.get(`http://coincap.io/history/${daysNum}day/${coinShort}`).then(res => {
         commit('SET_HISTORY', res.data.price);
       });
     }
@@ -39,6 +39,9 @@ const singleCoin = {
   getters: {
     getHistory(state) {
       return state.history;
+    },
+    getInfoCoin(state) {
+      return state.currentCoinInfo;
     }
   }
 }
@@ -47,7 +50,7 @@ function makeLabsAndPrices(arr) {
   const labels = [];
   const prices = [];
   for(let i = 0; i < arr.length; i++) {
-    labels.push(arr[i][0]);
+    labels.push(new Date(arr[i][0]).toLocaleDateString() );
     prices.push(arr[i][1]);
   }
   return {

@@ -5,7 +5,7 @@
         <router-link to='/main'>Pepe Cry</router-link>
       </li>
       <li v-if="userState.token">
-        <router-link to='/user'>{{userState.name || 'username'}}</router-link>
+        <router-link to='/profile'>Profile</router-link>
       </li>
       <li v-if="!userState.token">
         <router-link to='/signin'>Sign In</router-link>
@@ -14,7 +14,7 @@
         <router-link to='/login'>Login</router-link>
       </li>
       <li v-if="userState.token">
-        <a @click="LOG_OUT">Log Out</a>
+        <a @click="logOut">Log Out</a>
       </li>
     </ul>
   </header>
@@ -27,7 +27,11 @@ export default {
   methods: {
     ...mapMutations([
       'LOG_OUT'
-    ])
+    ]),
+    logOut() {
+      this.$router.push('/');
+      this.LOG_OUT();
+    }
   },
   computed: {
     ...mapGetters([

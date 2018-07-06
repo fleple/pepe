@@ -2,40 +2,56 @@
   <div>
     <h1 class='coin-title'>{{coinName}} {{currentPrice}}$</h1>
     <div class="coin-container">
-      <div class='stats'>
-        <h1>@{{userState.name}}</h1>
-        <hr>
-        <h2>Cash:{{userState.money}}$</h2>
-        <h2 v-if='!userState.coins[0]'>You havent coins yet</h2>
-        <ul v-else class='list-coins'>
-          <li class='single-coin' v-for="(coin, index) in userState.coins" :key="index">
-            {{coin.shortName}}: {{coin.count}}
+      <div class="coin-info">
+        <ul>
+          <li v-for="(item, index) in this.getInfoCoin" :key="index">
+            {{item}}
           </li>
         </ul>
       </div>
       <div class='calc-vals'>
-        <div class="coins-calc">
-          <input
-            :placeholder="coinName"
-            class='inp-val'
-            type="number"
-            @input="coinCountChange"
-            v-model="coinCount"
-          />
-          <input
-            placeholder="usd"
-            class='inp-val'
-            type="number"
-            @input="usdCountChange"
-            v-model="usdCount"
-          />
+        <div class="sell-coins">
+          <h2>Sell</h2>
+          <div class='coins-calc'>
+            <input
+              :placeholder="coinName"
+              class='inp-val'
+              type="number"
+              @input="sellCoinCountChange"
+              v-model="sellCoinCount"
+            />
+            <input
+              placeholder="usd"
+              class='inp-val'
+              type="number"
+              @input="sellUsdCountChange"
+              v-model="sellUsdCount"
+            />
+            <button class='btn-trade' @click='sell'>Sell</button>
+            <h4 class='sell-message'>{{sellMessage}}</h4>
+          </div>
+        </div> 
+        <div class='buy-coins'>
+          <h2>Buy</h2>
+          <div class="coins-calc">
+            <input
+              :placeholder="coinName"
+              class='inp-val'
+              type="number"
+              @input="buyCoinCountChange"
+              v-model="buyCoinCount"
+            />
+            <input
+              placeholder="usd"
+              class='inp-val'
+              type="number"
+              @input="buyUsdCountChange"
+              v-model="buyUsdCount"
+            />
+            <button class='btn-trade' @click='buy'>buy</button>
+            <h4 class='buy-message'>{{buyMessage}}</h4>
+          </div>
         </div>
-        <h4 class='message'>{{message}}</h4>
-        <button class='btn-buy' @click='buy'>buy</button>
-         <Chart :name='coinName'/>
-         <button @click='reqHistory(1)'>1 day</button>
-         <button @click='reqHistory(90)'>90 days</button>
-         <button @click='reqHistory(180)'>180 days</button>
       </div>
     </div>
   </div>
@@ -44,19 +60,18 @@
 <script>
 import axios from 'axios';
 import { mapGetters, mapMutations, mapActions } from 'vuex';
-import Chart from './Chart';
 
 export default {
   name: 'Coin',
-  components: {
-    Chart
-  },
-
+  
   data() {
     return {
-      usdCount: '',
-      coinCount: '',
-      message: ''
+      buyUsdCount: '',
+      buyCoinCount: '',
+      buyMessage: '',
+      sellUsdCount: '',
+      sellCoinCount: '',
+      sellMessage: ''
     }
   },
 
@@ -65,51 +80,81 @@ export default {
   },
 
   methods: {
-    ...mapMutations(['SET_USER']),
-    ...mapActions(['fetchInfo', 'fetchHistory']),
-    reqHistory(days) {
-      this.fetchHistory({
-        coinShort: this.coinName,
-        daysNum: days
-      });
+    ...mapMutations(['SET_USER', 'SET_COINS', 'SET_TRADE_HISTORY']),
+    ...mapActions(['fetchInfo']),
+
+    buyCoinCountChange(event) {
+      this.buyUsdCount = +this.currentPrice * +event.target.value;
+      this.buyMessage = `Buy ${event.target.value} ${this.coinName} for ${this.buyUsdCount}$`;
     },
-    coinCountChange(event) {
-      this.usdCount = +this.currentPrice * +event.target.value;
-      this.message = `Buy ${event.target.value} ${this.coinName} for ${this.usdCount}$`;
+
+    buyUsdCountChange(event) {
+      this.buyCoinCount = +event.target.value / +this.currentPrice;
+      this.buyMessage = `Buy ${this.coinName} on ${event.target.value}$, in sum ${this.buyCoinCount} ${this.coinName}`;
     },
-    usdCountChange(event) {
-      this.coinCount = +event.target.value / +this.currentPrice;
-      this.message = `Buy ${this.coinName} on ${event.target.value}$, in sum ${this.coinCount} ${this.coinName}`;
+
+    sellCoinCountChange(event) {
+      this.sellUsdCount = +this.currentPrice * +event.target.value;
+      this.sellMessage = `Sell ${event.target.value} ${this.coinName} for ${this.sellUsdCount}$`;
     },
+
+    sellUsdCountChange(event) {
+      this.sellCoinCount = +event.target.value / +this.currentPrice;
+      this.sellMessage = `Sell ${this.sellCoinCount} ${this.coinName} to get ${event.target.value}$`;
+    },
+
     buy() {
       const buyInfo = {
         token: localStorage.pepeCry,
         email: this.userState.email,
-        usdCount: this.usdCount,
+        usdCount: this.buyUsdCount,
         coinName: this.coinName,
-        coinCount: this.coinCount
+        coinCount: this.buyCoinCount
       };
-      // console.log('ending to buy', buyInfo);
+
       axios.post('/api/trade/buy', buyInfo).then(res => {
         console.log('buy res', res);
-        this.SET_USER(res.data.user);
+        this.SET_COINS(res.data.user);
+        this.SET_TRADE_HISTORY(res.data.user);
       });
       
-      this.usdCount = '';
-      this.coinCount = '';
+      this.buyUsdCount = '';
+      this.buyCoinCount = '';
+    },
+
+    sell() {
+      const sellInfo = {
+        token: localStorage.pepeCry,
+        email: this.userState.email,
+        usdCount: this.sellUsdCount,
+        coinName: this.coinName,
+        coinCount: this.sellCoinCount
+      };
+
+      axios.post('/api/trade/sell', sellInfo).then(res => {
+        console.log('buy res', res);
+        this.SET_COINS(res.data.user);
+        this.SET_TRADE_HISTORY(res.data.user);
+      });
+
+
+      this.sellUsdCount = '';
+      this.sellCoinCount = '';
     }
+
   },
 
   computed: {
-    ...mapGetters(['userState']),
+    ...mapGetters(['userState', 'currentCoins', 'getInfoCoin']),
+
     coinName() {
       return this.$route.params.coin;
     },
+
     currentPrice() {
       const coinName = this.$route.params.coin;
-      const { currentCoins } = this.$store.getters;
-      if(currentCoins[0])
-        return currentCoins.find(coin => coinName === coin.short).price;
+      if(this.currentCoins[0])
+        return this.currentCoins.find(coin => coinName === coin.short).price;
       return 
     }
   }
@@ -127,9 +172,9 @@ export default {
 .coin-container {
   display: flex;
   justify-content: space-between;
-  width: 1150px;
+  width: 90%;
   margin: 0 auto;
-  min-height: 500px;
+  min-height: 550px;
 }
 
 .stats {
@@ -146,22 +191,39 @@ hr {
   border: none;
 }
 
+.coin-info {
+  width: 300px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 10px;
+}
+
 .calc-vals {
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
   padding: 10px;
-  width: 75%;
   color: white;
+  display: flex;
+  width: 750px;
+  margin: 0 auto;
+  justify-content: space-between;
+}
+
+.buy-coins,
+.sell-coins {
+  width: 45%;
+  max-width: 45%;
 }
 
 .coins-calc {
   display: flex;
-  justify-content: space-around;
+  flex-direction: column;
   align-items: center;
 }
 
-.inp-val,.btn-buy {
+.inp-val,.btn-trade {
   display: block;
+  box-sizing: border-box;
   padding: 15px;
   border: none;
   margin-bottom: 10px;
@@ -173,22 +235,20 @@ hr {
   color: #ffffff;
   transition: all .25s ease-in-out;
   border-radius: 4px;
-  width: 40%;
+  width: 95%;
 }
 
-.btn-buy {
-  width: 94.8%;
-  margin: 0 auto;
+.btn-trade {
   transition: all .3s ease;
 }
 
-.btn-buy:hover {
+.btn-trade:hover {
   cursor: pointer;
   background-color: rgba(255, 255, 255, 0.2);
 }
 
 .inp-val:focus,
-.btn-buy:focus {
+.btn-trade:focus {
   outline: none;
 }
 
@@ -196,8 +256,8 @@ input::placeholder {
   color: #ffffff;
 }
 
-.message {
-  text-align-last: left;
+.buy-message {
+  text-align-last: center;
   padding-left: 20px;
 }
 
