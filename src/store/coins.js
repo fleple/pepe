@@ -4,13 +4,15 @@ import io from "socket.io-client";
 const coins = {
   state: {
     allCoins: [],
-    currentCoins: []
+    currentCoins: [],
+    step: 15,
+    offset: 30
   },
   
   mutations: {
     FETCH_COINS(state, coins) {
       state.allCoins = coins;
-      state.currentCoins = coins.slice(0, 30);
+      state.currentCoins = coins.slice(0, state.offset);
     },
     REPLACE_ONE(state ,coin) {
       for(let i = 0; i < state.currentCoins.length; i++) {
@@ -18,6 +20,10 @@ const coins = {
           state.currentCoins.splice(i, 1, coin);
         }
       }
+    },
+    ADD_COINS(state, count) {
+      state.currentCoins.push(...state.allCoins.splice(state.offset, state.step));
+      state.offset += state.step;
     }
   },
 

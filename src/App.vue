@@ -37,6 +37,7 @@ html,body,ul,li,a, header,h1,h2,h3,h4,h5,h6 {
 
 body {
   background: linear-gradient(to right, #3494E6, #EC6EAD);
+  padding-bottom: 30px;
 }
 
 #app {

@@ -29,7 +29,6 @@ const singleCoin = {
       });
     },
     fetchHistory({ commit }, { daysNum, coinShort }) {
-      // console.log('req his', daysNum, coinShort);
       return axios.get(`http://coincap.io/history/${daysNum}day/${coinShort}`).then(res => {
         commit('SET_HISTORY', res.data.price);
       });

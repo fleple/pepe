@@ -5,27 +5,37 @@
       <h4 class='user-cash'>{{userState.money}}$</h4>
       <hr>
       <ul>
-        <li class='coin-item' v-for="(coin, index) in userState.coins" :key="index">
-          <h4>{{coin.shortName}}</h4>
-          <h4>{{coin.count}}</h4> 
+        <li
+          class='coin-item'
+          v-for="(coin, index) in userState.coins"
+          :key="index"
+          v-if="coin.count > 0"
+          @click="goToCoin(coin.shortName)"
+          >
+          <h4 class='item-icon'>
+            <i :class="[`crypto-icon-32-white-${coin.shortName.toLowerCase()}` ,'crypto-icon-32 crypto-icon-32-white']"/>
+          </h4>
+          <h4 class='item-name'>
+            <span>{{coin.shortName}}</span>
+          </h4>
+          <h4 class='item-count'>{{coin.count}}</h4> 
         </li>
       </ul>
     </div>
     <div class='user-history'>
-      <!-- <ul>
-        <li v-for="(item, index) in userState" :key="index">{{item}}</li>
-      </ul> -->
       <table class='history-table'>
         <thead>
           <tr>
             <th>Date</th>
             <th>Info</th>
+            <th>Current</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="item in userState.tradeHistory" :key="item._id">
             <td>{{item.date}}</td>
             <td>{{item.info}}</td>
+            <td>{{ getPriceByName(item.info)}}$</td>
           </tr>
         </tbody>
       </table>
@@ -42,23 +52,46 @@ export default {
       this.$router.push('/');
     }
   },
+  
+  methods: {
+    getCoinName(info) {
+      return info.split(' ')[2];
+    },
+    getPriceByName(info) {
+      const coinName = info.split(' ')[2];
+      const coin = this.currentCoins.filter(coin => coin.short === coinName)[0];
+      if(coin) {
+        return coin.price;
+      }
+      return 'nothing';
+    },
+    goToCoin(coinName) {
+      this.$router.push({
+        name: 'Coin',
+        params: { coin: coinName }
+      });
+    }
+  },
+
   computed: {
-    ...mapGetters(['userState'])
+    ...mapGetters(['userState', 'currentCoins'])
   }
 };
 </script>
 
 <style>
+
 .user-page {
   width: 90%;
   margin: 0 auto;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
   justify-content: space-between;
-  min-height: 550px;
 }
 
 ul {
   list-style: none;
+  font-size: 14px;
 }
 
 .user-cash {
@@ -66,8 +99,25 @@ ul {
 }
 
 .coin-item {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: auto 1fr 1fr;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 5px;
+  transition: all .25s ease-in-out;
+}
+
+.coin-item:hover {
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.2)
+}
+
+.item-name {
+  text-align: left;
+  padding-left: 5px;
+}
+.item-count {
+  text-align: right;
 }
 
 .user-state {
@@ -126,6 +176,10 @@ hr {
   background: white;
   height: 1px;
   border: none;
+}
+.crypto-icon-32 {
+  /* height: 32px; */
+  transform: scale(0.9);
 }
 </style>
 

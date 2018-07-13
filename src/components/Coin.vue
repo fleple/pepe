@@ -3,10 +3,15 @@
     <h1 class='coin-title'>{{coinName}} {{currentPrice}}$</h1>
     <div class="coin-container">
       <div class="coin-info">
-        <ul>
-          <li v-for="(item, index) in this.getInfoCoin" :key="index">
-            {{item}}
+        <ul class='coin-list'>
+          <li class='coin-list-item'>
+            <h2>
+              #{{this.getInfoCoin.rank}} {{this.getInfoCoin.display_name}}
+            </h2>  
           </li>
+          <hr>
+          <li class='coin-list-item'>{{this.getInfoCoin.cap24hrChange}}% for last 24 hours</li>
+          <li class='coin-list-item'>Total Volue {{this.makePrice(this.getInfoCoin.volume)}}$</li> 
         </ul>
       </div>
       <div class='calc-vals'>
@@ -80,29 +85,51 @@ export default {
   },
 
   methods: {
-    ...mapMutations(['SET_USER', 'SET_COINS', 'SET_TRADE_HISTORY']),
+    ...mapMutations(['SET_USER', 'SET_COINS', 'SET_TRADE_HISTORY', 'SET_MONEY']),
     ...mapActions(['fetchInfo']),
 
     buyCoinCountChange(event) {
+      if(+event.target.value < 0) {
+        this.buyCoinCount = 0;
+        return;
+      }
       this.buyUsdCount = +this.currentPrice * +event.target.value;
       this.buyMessage = `Buy ${event.target.value} ${this.coinName} for ${this.buyUsdCount}$`;
     },
 
     buyUsdCountChange(event) {
+      if(+event.target.value < 0) {
+        this.buyUsdCount = 0;
+        return;
+      }
       this.buyCoinCount = +event.target.value / +this.currentPrice;
       this.buyMessage = `Buy ${this.coinName} on ${event.target.value}$, in sum ${this.buyCoinCount} ${this.coinName}`;
     },
 
     sellCoinCountChange(event) {
+      if(+event.target.value < 0) {
+        this.sellCoinCount = 0;
+        return;
+      }
       this.sellUsdCount = +this.currentPrice * +event.target.value;
       this.sellMessage = `Sell ${event.target.value} ${this.coinName} for ${this.sellUsdCount}$`;
     },
 
     sellUsdCountChange(event) {
+      if(+event.target.value < 0) {
+        this.sellUsdCount = 0;
+        return;
+      }
       this.sellCoinCount = +event.target.value / +this.currentPrice;
       this.sellMessage = `Sell ${this.sellCoinCount} ${this.coinName} to get ${event.target.value}$`;
     },
 
+    setUserFields(userData) {
+      this.SET_COINS(userData);
+      this.SET_TRADE_HISTORY(userData);
+      this.SET_MONEY(userData);
+    },
+    
     buy() {
       const buyInfo = {
         token: localStorage.pepeCry,
@@ -114,8 +141,7 @@ export default {
 
       axios.post('/api/trade/buy', buyInfo).then(res => {
         console.log('buy res', res);
-        this.SET_COINS(res.data.user);
-        this.SET_TRADE_HISTORY(res.data.user);
+        setUserFields(res.data.user);
       });
       
       this.buyUsdCount = '';
@@ -133,14 +159,30 @@ export default {
 
       axios.post('/api/trade/sell', sellInfo).then(res => {
         console.log('buy res', res);
-        this.SET_COINS(res.data.user);
-        this.SET_TRADE_HISTORY(res.data.user);
+        setUserFields(res.data.user);
       });
-
 
       this.sellUsdCount = '';
       this.sellCoinCount = '';
-    }
+    },
+
+    makePrice: function(price) {
+      let result = price.toLocaleString('ru-RU');
+      if(!result.split(',')[1]) {
+        return result + '.0000';
+      }
+      let currentLength = result.split(',')[1].length;
+      if(currentLength === 3) {
+        result += '0';
+      } else if(currentLength === 2) {
+        result += '00';
+      } else if(currentLength === 1) {
+        result += '000';
+      } else if(currentLength === 0) {
+        result += '0000';
+      }
+      return result;
+    },
 
   },
 
@@ -266,6 +308,15 @@ input::placeholder {
 }
 .single-coin {
   text-align: center;
+}
+
+.coin-list {
+  list-style: none;
+  color: #fff;
+}
+
+.coin-list-item {
+  font-size: 18px;
 }
 
 </style>

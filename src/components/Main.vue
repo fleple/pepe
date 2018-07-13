@@ -32,15 +32,17 @@
         </tr>
       </tbody>
     </table>
+    <button class="more-coins" @click='ADD_COINS'>More coins</button>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapMutations ,mapGetters } from 'vuex';
 
 export default {
   name: 'Main',
   methods: {
+    ...mapMutations(['ADD_COINS']),
     goTo: function(coinShort) {
       this.$router.push({
         name: 'Coin',
@@ -82,7 +84,7 @@ export default {
   width: 1150px;
   margin: 0 auto;
   margin-top: 50px;
-  margin-bottom: 50px;
+  margin-bottom: 30px;
   table-layout: fixed;
   border-collapse: collapse;
   border: 1px solid  rgba(255, 255, 255, 0.2);
@@ -103,6 +105,7 @@ td, th {
 }
 td {
   border-bottom: 1px solid  rgba(255, 255, 255, 0.2);
+  font-size: 14px;
 }
 
 .row:hover {
@@ -120,6 +123,33 @@ td {
 
 .crypto-icon-32 {
   transform: translateY(8px) scale(0.9);
+}
+
+.more-coins {
+  display: block;
+  box-sizing: border-box;
+  padding: 15px;
+  border: none;
+  margin-bottom: 10px;
+  font-size: 16px;
+  font-weight: bolder;
+  text-transform: uppercase;
+  background-color: transparent;
+  border: 1px solid #ffffff;
+  color: #ffffff;
+  transition: all .25s ease-in-out;
+  border-radius: 4px;
+  width: 20%;
+  margin: 0 auto;
+}
+
+.more-coins:hover {
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.more-coins:focus {
+  outline: none;
 }
 </style>
 
