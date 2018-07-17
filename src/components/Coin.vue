@@ -2,40 +2,42 @@
   <div>
     <h1 class='coin-title'>{{coinName}} {{currentPrice}}$</h1>
     <div class="coin-container">
-      <div class="coin-info">
-        <ul class='coin-list'>
+      <!-- <div class="coin-info">
+        <ul class='coin-list' v-if="currentInfo">
           <li class='coin-list-item'>
-            <h2>
-              #{{this.getInfoCoin.rank}} {{this.getInfoCoin.display_name}}
+            <h2 class='coin-title-item'>
+              #{{currentInfo.index}} {{currentInfo.long}}
+              <i :class="[`crypto-icon-32-white-${coinName.toLowerCase()}` ,'crypto-icon-32 crypto-icon-32-white']"/>
             </h2>  
           </li>
           <hr>
-          <li class='coin-list-item'>{{this.getInfoCoin.cap24hrChange}}% for last 24 hours</li>
-          <li class='coin-list-item'>Total Volue {{this.makePrice(this.getInfoCoin.volume)}}$</li> 
+          <li class='coin-list-item'>
+            {{currentInfo.perc}}% for last 24 hours
+          </li>
+          <li class='coin-list-item'>
+            Total Volue {{this.makePrice(currentInfo.volume)}}$
+          </li> 
         </ul>
-      </div>
-      <div class='calc-vals'>
-        <div class="sell-coins">
-          <h2>Sell</h2>
-          <div class='coins-calc'>
-            <input
-              :placeholder="coinName"
-              class='inp-val'
-              type="number"
-              @input="sellCoinCountChange"
-              v-model="sellCoinCount"
-            />
-            <input
-              placeholder="usd"
-              class='inp-val'
-              type="number"
-              @input="sellUsdCountChange"
-              v-model="sellUsdCount"
-            />
-            <button class='btn-trade' @click='sell'>Sell</button>
-            <h4 class='sell-message'>{{sellMessage}}</h4>
-          </div>
-        </div> 
+        <ul class='user-list'>
+          <li>
+            <h2>
+              @{{userState.name}}
+            </h2>
+          </li>
+          <hr>
+          <li>{{userState.money}}$</li>
+          <li v-if='currentCoinCount'>{{currentCoinCount.count}} {{coinName}}</li>
+          <li v-else>0 {{coinName}}</li>
+        </ul>
+      </div> -->
+      <CoinInfo
+        :coinName='coinName'
+        :info='currentInfo'
+        :user='userState'
+        :count='currentCoinCount'
+        :infoCoin='getInfoCoin'
+      />
+      <div class='calc-vals' v-if='this.userState.token'>
         <div class='buy-coins'>
           <h2>Buy</h2>
           <div class="coins-calc">
@@ -57,6 +59,27 @@
             <h4 class='buy-message'>{{buyMessage}}</h4>
           </div>
         </div>
+        <div class="sell-coins">
+          <h2>Sell</h2>
+          <div class='coins-calc'>
+            <input
+              :placeholder="coinName"
+              class='inp-val'
+              type="number"
+              @input="sellCoinCountChange"
+              v-model="sellCoinCount"
+            />
+            <input
+              placeholder="usd"
+              class='inp-val'
+              type="number"
+              @input="sellUsdCountChange"
+              v-model="sellUsdCount"
+            />
+            <button class='btn-trade' @click='sell'>Sell</button>
+            <h4 class='sell-message'>{{sellMessage}}</h4>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -65,10 +88,13 @@
 <script>
 import axios from 'axios';
 import { mapGetters, mapMutations, mapActions } from 'vuex';
+import CoinInfo from './CoinInfo';
 
 export default {
   name: 'Coin',
-  
+  components: {
+    CoinInfo
+  },
   data() {
     return {
       buyUsdCount: '',
@@ -141,7 +167,7 @@ export default {
 
       axios.post('/api/trade/buy', buyInfo).then(res => {
         console.log('buy res', res);
-        setUserFields(res.data.user);
+        this.setUserFields(res.data.user);
       });
       
       this.buyUsdCount = '';
@@ -158,36 +184,40 @@ export default {
       };
 
       axios.post('/api/trade/sell', sellInfo).then(res => {
-        console.log('buy res', res);
-        setUserFields(res.data.user);
+        console.log('sell res', res);
+        this.setUserFields(res.data.user);
       });
 
       this.sellUsdCount = '';
       this.sellCoinCount = '';
     },
 
-    makePrice: function(price) {
-      let result = price.toLocaleString('ru-RU');
-      if(!result.split(',')[1]) {
-        return result + '.0000';
-      }
-      let currentLength = result.split(',')[1].length;
-      if(currentLength === 3) {
-        result += '0';
-      } else if(currentLength === 2) {
-        result += '00';
-      } else if(currentLength === 1) {
-        result += '000';
-      } else if(currentLength === 0) {
-        result += '0000';
-      }
-      return result;
-    },
+    // makePrice: function(price) {
+    //   console.log('price',price);
+    //   let result = null;
+    //   if(price) {
+    //     result = price.toLocaleString('ru-RU');
+    //   }
+    //   if(!result.split(',')[1]) {
+    //     return result + '.0000';
+    //   }
+    //   let currentLength = result.split(',')[1].length;
+    //   if(currentLength === 3) {
+    //     result += '0';
+    //   } else if(currentLength === 2) {
+    //     result += '00';
+    //   } else if(currentLength === 1) {
+    //     result += '000';
+    //   } else if(currentLength === 0) {
+    //     result += '0000';
+    //   }
+    //   return result || 'nothing';
+    // },
 
   },
 
   computed: {
-    ...mapGetters(['userState', 'currentCoins', 'getInfoCoin']),
+    ...mapGetters(['userState', 'currentCoins','allCoins' ,'getInfoCoin']),
 
     coinName() {
       return this.$route.params.coin;
@@ -195,10 +225,34 @@ export default {
 
     currentPrice() {
       const coinName = this.$route.params.coin;
-      if(this.currentCoins[0])
-        return this.currentCoins.find(coin => coinName === coin.short).price;
-      return 
+      if(this.allCoins[0])
+        return this.allCoins.find(coin => coinName === coin.short).price;
+      return
+    },
+    
+    currentInfo() {
+      const coinName = this.$route.params.coin;
+      let result = null;
+      for(let i = 0; i < this.allCoins.length; i++) {
+        if(coinName === this.allCoins[i].short) {
+          result = this.allCoins[i];
+          result.index = i + 1;
+          return result;
+        }
+      }
+    },
+
+    currentCoinCount() {
+      let result = 0;
+      if(this.userState) {
+        result = this.userState.coins.filter(coin => {
+          return coin.shortName === this.$route.params.coin;
+        })[0];
+      }
+      console.log('currentCoinCount', result);
+      return result;
     }
+
   }
 }
 </script>
@@ -216,15 +270,7 @@ export default {
   justify-content: space-between;
   width: 90%;
   margin: 0 auto;
-  min-height: 550px;
-}
-
-.stats {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-  padding: 10px;
-  width: 20%;
-  color: white;
+  min-height: 250px;
 }
 
 hr {
@@ -233,17 +279,29 @@ hr {
   border: none;
 }
 
-.coin-info {
+.coin-list,
+.user-list {
   width: 300px;
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
   padding: 10px;
+  list-style: none;
+  color: white;
+  margin-bottom: 20px;
+  font-size: 18px;
+}
+
+.coin-title-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;  
 }
 
 .calc-vals {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-  padding: 10px;
+  /* background-color: rgba(255, 255, 255, 0.1); */
+  /* border-radius: 4px; */
+  /* padding: 10px; */
   color: white;
   display: flex;
   width: 750px;
@@ -255,6 +313,10 @@ hr {
 .sell-coins {
   width: 45%;
   max-width: 45%;
+  padding: 10px;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.1);
+
 }
 
 .coins-calc {

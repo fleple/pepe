@@ -1,5 +1,14 @@
 <template>
   <div>
+    <form class='form-search' @submit.prevent='searchCoins'>
+      <input
+        class='coin-search'
+        type="text"
+        placeholder="Coin"
+        @input='setSearchCoin'
+      />
+      <button class='btn-search' @click="searchCoins">Search</button>
+    </form>
     <table class='main-table'>
       <thead>
         <tr>
@@ -41,8 +50,14 @@ import { mapMutations ,mapGetters } from 'vuex';
 
 export default {
   name: 'Main',
+  data() {
+    return {
+      coinSearch: ''
+    }
+  },
+
   methods: {
-    ...mapMutations(['ADD_COINS']),
+    ...mapMutations(['ADD_COINS', 'SEARCH_COINS']),
     goTo: function(coinShort) {
       this.$router.push({
         name: 'Coin',
@@ -68,8 +83,15 @@ export default {
     },
     makeCapCost: function(mktcap) {
       return mktcap.toLocaleString('en').split('.')[0].split(',').join(' ');
+    },
+    setSearchCoin(event) {
+      this.coinSearch = event.target.value;
+    },
+    searchCoins(event) {
+      this.SEARCH_COINS(this.coinSearch);
     }
   },
+
   computed: {
     ...mapGetters([
       'allCoins',
@@ -80,10 +102,67 @@ export default {
 </script>
 
 <style scoped>
+.form-search {
+  display: flex;
+  width: 400px;
+  align-items: cener;
+  justify-content: center;
+  margin: 0 auto;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  padding: 10px;
+}
+
+
+.coin-search,
+.btn-search {
+  display: block;
+  box-sizing: border-box;
+  padding: 10px;
+  border: none;
+  font-size: 14px;
+  font-weight: bolder;
+  text-transform: uppercase;
+  background-color: transparent;
+  border: 1px solid #ffffff;
+  color: #ffffff;
+  transition: all .25s ease-in-out;
+  border-radius: 4px;
+  width: 300px;
+  text-align: center;
+  transition: all .25s ease-in-out;
+}
+
+.coin-search {
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+.btn-search {
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+  width: 100px;
+  border-left: none;
+}
+
+.btn-search:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+}
+
+input::placeholder {
+  color: #ffffff;
+  text-align: center;
+}
+
+.coin-search:focus,
+.btn-search:focus {
+  outline: none;
+}
+
 .main-table {
   width: 1150px;
   margin: 0 auto;
-  margin-top: 50px;
+  margin-top: 20px;
   margin-bottom: 30px;
   table-layout: fixed;
   border-collapse: collapse;

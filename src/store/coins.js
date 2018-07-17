@@ -21,9 +21,17 @@ const coins = {
         }
       }
     },
-    ADD_COINS(state, count) {
+    ADD_COINS(state) {
       state.currentCoins.push(...state.allCoins.splice(state.offset, state.step));
       state.offset += state.step;
+    },
+    SEARCH_COINS(state, word) {
+      if(word !== '') {
+        const val = word.toUpperCase();
+        state.currentCoins = state.allCoins.filter(coin => coin.long.startsWith(val) || coin.short.startsWith(val));
+      } else {
+        state.currentCoins = state.allCoins.slice(0, state.offset);
+      }
     }
   },
 

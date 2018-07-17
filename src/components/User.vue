@@ -1,10 +1,11 @@
 <template>
   <div class='user-page'>
-    <div class="user-state">
-      <h2 class='user-name'>@{{userState.name}}</h2>
-      <h4 class='user-cash'>{{userState.money}}$</h4>
-      <hr>
-      <ul>
+    <div class='side-bar'>
+      <div class="header-state">
+        <h2 class='user-name'>@{{userState.name}}</h2>
+        <h4 class='user-cash'>{{userState.money}}$</h4>
+      </div>
+      <ul class="user-coins">
         <li
           class='coin-item'
           v-for="(coin, index) in userState.coins"
@@ -21,6 +22,10 @@
           <h4 class='item-count'>{{coin.count}}</h4> 
         </li>
       </ul>
+      <div class='money-state'>
+        <h2>Total money</h2>
+        <h4>{{allMoney}}$</h4>
+      </div>
     </div>
     <div class='user-history'>
       <table class='history-table'>
@@ -74,7 +79,21 @@ export default {
   },
 
   computed: {
-    ...mapGetters(['userState', 'currentCoins'])
+    ...mapGetters(['userState', 'currentCoins', 'allCoins']),
+    allMoney() {
+      let result = 0;
+      if(this.userState.coins[0] && this.allCoins[0]) {
+      result = this.userState.money;
+        this.allCoins.forEach(coin => {
+          this.userState.coins.forEach(userCoin => {
+            if(coin.short === userCoin.shortName) {
+              result += coin.price * userCoin.count;
+            }
+          });
+        });
+      }
+      return result;
+    }
   }
 };
 </script>
@@ -94,8 +113,26 @@ ul {
   font-size: 14px;
 }
 
+.side-bar {
+  width: 300px;
+}
+
+.header-state {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  text-align: center;
+  padding: 10px;
+  box-sizing: border-box;
+  margin-bottom: 20px;
+}
+
+.user-name {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 5px;
+}
+
 .user-cash {
-  text-align: left;
+  padding-top: 5px;
 }
 
 .coin-item {
@@ -104,6 +141,8 @@ ul {
   align-items: center;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   padding: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
   transition: all .25s ease-in-out;
 }
 
@@ -114,19 +153,39 @@ ul {
 
 .item-name {
   text-align: left;
-  padding-left: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 .item-count {
   text-align: right;
 }
 
-.user-state {
+.user-coins {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border-radius: 4px;
+  width: 300px;
+}
+
+.user-coins li:last-child {
+  border: none;
+}
+
+.money-state {
+  margin-top: 20px;
   background-color: rgba(255, 255, 255, 0.1);
   color: #fff;
   padding: 10px;
-  padding-top: 20px;
-  border-radius: 4px;
-  width: 300px;
+  border-radius: 5px;
+}
+
+.money-state h2 {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 5px;
+}
+
+.money-state h4 {
+  padding-top: 5px;
 }
 
 .user-history {
@@ -137,10 +196,6 @@ ul {
   border-radius: 4px;
 }
 
-.user-name {
-  text-align: left;
-  color: #fff;
-}
 
 .history-table {
   width: 90%;
@@ -176,6 +231,7 @@ hr {
   background: white;
   height: 1px;
   border: none;
+  margin-bottom: 0;
 }
 .crypto-icon-32 {
   /* height: 32px; */
